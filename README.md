@@ -4,5 +4,5 @@
 * Python version used = 3.11.1
 
 ```
-Enter pip install -r requirements.txt before using
+Enter in cmd pip install -r requirements.txt before using
 ```
