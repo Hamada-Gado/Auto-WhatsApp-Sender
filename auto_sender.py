@@ -7,17 +7,18 @@ from tkinter import messagebox
 import pyautogui as pag
 import pygetwindow as pgw
 import pyperclip
+import webbrowser
 import win32clipboard  # type: ignore
 from PIL import Image
 
 from debug.test import *
 from exceptions import *
 
-
 class Auto_Sender():
     # TODO make it possible to send more than one text message or photo
     
     WHATSAPP_TITLE  : str   = "WhatsApp"
+    WHATSAPP_URL    : str   = "https://web.whatsapp.com/"
     
     def __init__(self, whatsApp_path: Path = Path('C:/Program Files/WindowsApps/5319275A.WhatsAppDesktop_2.2252.7.0_x64__cv1g1gvanyjgm/WhatsApp.exe')) -> None:
         self.whatsApp_path = whatsApp_path
@@ -46,7 +47,7 @@ class Auto_Sender():
             self._send_image_to_clipboard(arg)
             return 
 
-    def open_app(self, minSearchTime= 5) -> None:
+    def open_app_offline(self, minSearchTime= 5) -> None:
         subprocess.run(['start', "", self.whatsApp_path], shell = True).check_returncode()
 
         start_time = time.time()
@@ -71,8 +72,16 @@ class Auto_Sender():
         
         self.whatsApp_window.maximize()
         time.sleep(minSearchTime) # wait to make sure the application is ready for shortcuts
+        
+    def open_app_online(self) -> None:
+        if not webbrowser.open(Auto_Sender.WHATSAPP_URL):
+            raise WindowNotFoundException
+        
+        pag.press("f11")
+        
 
-    def send(self, name: str, message: str, outer_interval= 0.5, internal_interval: float = 0.1) -> None:
+    def send_offline(self, name: str, outer_interval: float = 0.5, internal_interval: float = 0.1) -> None:
+        pag.hotkey("ctrl", "1", interval= internal_interval)
         pag.hotkey("ctrl", "f", interval= internal_interval)
         pag.hotkey("ctrl", "a", interval= internal_interval)
         pag.press("backspace", interval= internal_interval)
@@ -87,14 +96,28 @@ class Auto_Sender():
         pag.hotkey("ctrl", "v", interval= internal_interval)
         pag.press("enter")
         
+    def send_online(self, name: str, outer_interval: float = 0.5, internal_interval: float = 0.1):
+        pag.hotkey("alt", "k", interval= internal_interval)
+        pag.hotkey("ctrl", "a", interval= internal_interval)
+        pag.press("backspace", interval= internal_interval)
+        time.sleep(outer_interval)
+        
+        pag.typewrite(name, interval= internal_interval)
+        time.sleep(outer_interval)
+        
+        pag.press("enter", interval= internal_interval)
+        time.sleep(outer_interval)
+        
+        pag.hotkey("ctrl", "v", interval= internal_interval)
+        pag.press("enter")
+        
     def send_all(self):
-        pag.hotkey("ctrl", "1")
         for name in NAMES:
-            self.send(name, MESSAGE)
+            self.send_online(name)
 
     def run(self) -> None:
         try:
-            self.open_app() 
+            self.open_app_online() 
         except subprocess.CalledProcessError: # the os handles it
             return
         except WindowNotFoundException as e:
