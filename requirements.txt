@@ -1,4 +1,5 @@
-pyautogui
+pygetwindow
 pillow
+pyautogui
 pywin32
 pyperclip
