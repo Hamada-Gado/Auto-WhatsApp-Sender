@@ -10,7 +10,7 @@ import pyperclip
 import win32clipboard  # type: ignore
 from PIL import Image
 
-from data import *
+from debug.test import *
 from exceptions import *
 
 
@@ -19,7 +19,7 @@ class Auto_Sender():
     
     WHATSAPP_TITLE  : str   = "WhatsApp"
     
-    def __init__(self, whatsApp_path: Path = Path('C:/Program files/WindowsApps/5319275A.WhatsAppDesktop_2.2248.9.0_x64__cv1g1gvanyjgm/WhatsApp.exe')) -> None:
+    def __init__(self, whatsApp_path: Path = Path('C:/Program Files/WindowsApps/5319275A.WhatsAppDesktop_2.2252.7.0_x64__cv1g1gvanyjgm/WhatsApp.exe')) -> None:
         self.whatsApp_path = whatsApp_path
         self.whatsApp_window : pgw.Window
         
@@ -47,10 +47,7 @@ class Auto_Sender():
             return 
 
     def open_app(self, minSearchTime= 5) -> None:
-        try:
-            subprocess.run(['start', "", self.whatsApp_path], shell = True).check_returncode()
-        except subprocess.CalledProcessError:
-            return
+        subprocess.run(['start', "", self.whatsApp_path], shell = True).check_returncode()
 
         start_time = time.time()
     
