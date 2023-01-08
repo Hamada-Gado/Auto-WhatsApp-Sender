@@ -19,11 +19,21 @@ class Auto_Sender():
     
     WHATSAPP_TITLE  : str   = "WhatsApp"
     WHATSAPP_URL    : str   = "https://web.whatsapp.com/"
+    OPINING_METHOD  : bool  = True
     
-    def __init__(self, whatsApp_path: Path = Path('C:/Program Files/WindowsApps/5319275A.WhatsAppDesktop_2.2252.7.0_x64__cv1g1gvanyjgm/WhatsApp.exe')) -> None:
+    def __init__(self, whatsApp_path: Path = PATH) -> None:
         self.whatsApp_path = whatsApp_path
         self.whatsApp_window : pgw.Window
+                
+    def set_message(self, message: str | Image.Image):
+        if isinstance(message, str):
+            self._send_text_to_clipboard(message)
+            return
         
+        if isinstance(message, Image.Image):
+            self._send_image_to_clipboard(message)
+            return
+
     def _send_image_to_clipboard(self, image: Image.Image):
         output = BytesIO()
         image.convert('RGB').save(output, 'BMP')
@@ -37,15 +47,6 @@ class Auto_Sender():
         
     def _send_text_to_clipboard(self, message: str):
         pyperclip.copy(message)
-        
-    def set_clipboard(self, arg: str | Image.Image):
-        if isinstance(arg, str):
-            self._send_text_to_clipboard(arg)
-            return
-        
-        if isinstance(arg, Image.Image):
-            self._send_image_to_clipboard(arg)
-            return 
 
     def open_app_offline(self, minSearchTime= 5) -> None:
         subprocess.run(['start', "", self.whatsApp_path], shell = True).check_returncode()
@@ -74,13 +75,19 @@ class Auto_Sender():
         time.sleep(minSearchTime) # wait to make sure the application is ready for shortcuts
         
     def open_app_online(self) -> None:
-        if not webbrowser.open(Auto_Sender.WHATSAPP_URL):
+        if not webbrowser.open_new(Auto_Sender.WHATSAPP_URL):
             raise WindowNotFoundException
         
+        time.sleep(5)
         pag.press("f11")
         
+    def send(self,*args, **kwargs):
+        if self.OPINING_METHOD:
+            self._send_offline(*args, **kwargs)
+        else:
+            self._send_online(*args, **kwargs)
 
-    def send_offline(self, name: str, outer_interval: float = 0.5, internal_interval: float = 0.1) -> None:
+    def _send_offline(self, name: str, outer_interval: float = 0.5, internal_interval: float = 0.1) -> None:
         pag.hotkey("ctrl", "1", interval= internal_interval)
         pag.hotkey("ctrl", "f", interval= internal_interval)
         pag.hotkey("ctrl", "a", interval= internal_interval)
@@ -96,8 +103,12 @@ class Auto_Sender():
         pag.hotkey("ctrl", "v", interval= internal_interval)
         pag.press("enter")
         
-    def send_online(self, name: str, outer_interval: float = 0.5, internal_interval: float = 0.1):
+    def _send_online(self, name: str, outer_interval: float = 1.5, internal_interval: float = 0.1):
         pag.hotkey("alt", "k", interval= internal_interval)
+        
+        #// pag.hotkey("ctrl", "alt", "/", interval= internal_interval)
+        #// pag.hotkey("ctrl", "alt", "/", interval= internal_interval)
+
         pag.hotkey("ctrl", "a", interval= internal_interval)
         pag.press("backspace", interval= internal_interval)
         time.sleep(outer_interval)
@@ -113,7 +124,7 @@ class Auto_Sender():
         
     def send_all(self):
         for name in NAMES:
-            self.send_online(name)
+            self.send(name)
 
     def run(self) -> None:
         try:
@@ -124,5 +135,5 @@ class Auto_Sender():
             messagebox.showerror(title= "Window not found", message= str(e))
             return
 
-        self.set_clipboard(IMAGE)
+        self.set_message(TEXT)
         self.send_all()
