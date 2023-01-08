@@ -9,5 +9,5 @@ Enter in cmd pip install -r requirements.txt before using
 
 ```
 To find the location of WhatsApp.exe install everything from google
-and you can use to find the path to the file
+and you can use it to find the path to the file
 ```
