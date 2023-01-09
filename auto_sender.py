@@ -1,5 +1,6 @@
 import subprocess
 import time
+import webbrowser
 from io import BytesIO
 from pathlib import Path
 from tkinter import messagebox
@@ -7,12 +8,12 @@ from tkinter import messagebox
 import pyautogui as pag
 import pygetwindow as pgw
 import pyperclip
-import webbrowser
 import win32clipboard  # type: ignore
 from PIL import Image
 
-from debug.test import *
+from data import Data
 from exceptions import *
+
 
 class Auto_Sender():
     # TODO make it possible to send more than one text message or photo
@@ -21,11 +22,10 @@ class Auto_Sender():
     WHATSAPP_URL    : str   = "https://web.whatsapp.com/"
     OPINING_METHOD  : bool  = True
     
-    def __init__(self, whatsApp_path: Path = PATH) -> None:
-        self.whatsApp_path = whatsApp_path
-        self.whatsApp_window : pgw.Window
+    def __init__(self, data: Data) -> None:
+        self.data: Data = data
                 
-    def set_message(self, message: str | Image.Image):
+    def set_message(self, message: str | Image.Image) -> None:
         if isinstance(message, str):
             self._send_text_to_clipboard(message)
             return
@@ -34,7 +34,7 @@ class Auto_Sender():
             self._send_image_to_clipboard(message)
             return
 
-    def _send_image_to_clipboard(self, image: Image.Image):
+    def _send_image_to_clipboard(self, image: Image.Image) -> None:
         output = BytesIO()
         image.convert('RGB').save(output, 'BMP')
         data = output.getvalue()[14:]
@@ -45,11 +45,23 @@ class Auto_Sender():
         win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
         win32clipboard.CloseClipboard()
         
-    def _send_text_to_clipboard(self, message: str):
+    def _send_text_to_clipboard(self, message: str) -> None:
         pyperclip.copy(message)
+        
+    def check_data(self) -> None:
+        pass
+        
+    def open(self) -> None:
+        if self.data.online:
+            self._open_app_online()
+        else:
+            self._open_app_offline()
 
-    def open_app_offline(self, minSearchTime= 5) -> None:
-        subprocess.run(['start', "", self.whatsApp_path], shell = True).check_returncode()
+    def _open_app_offline(self, minSearchTime: float = 5) -> None:
+        try:
+            subprocess.run(['start', "", self.data.whatsApp_path], capture_output= True, shell = True).check_returncode() # type: ignore
+        except subprocess.CalledProcessError as e:
+            raise FileNotFoundError(str(e.stderr, encoding="utf-8"))
 
         start_time = time.time()
     
@@ -74,14 +86,14 @@ class Auto_Sender():
         self.whatsApp_window.maximize()
         time.sleep(minSearchTime) # wait to make sure the application is ready for shortcuts
         
-    def open_app_online(self) -> None:
+    def _open_app_online(self, minWaitTime: float = 5) -> None:
         if not webbrowser.open_new(Auto_Sender.WHATSAPP_URL):
             raise WindowNotFoundException
         
-        time.sleep(5)
+        time.sleep(minWaitTime)
         pag.press("f11")
         
-    def send(self,*args, **kwargs):
+    def send(self,*args, **kwargs) -> None:
         if self.OPINING_METHOD:
             self._send_offline(*args, **kwargs)
         else:
@@ -103,11 +115,8 @@ class Auto_Sender():
         pag.hotkey("ctrl", "v", interval= internal_interval)
         pag.press("enter")
         
-    def _send_online(self, name: str, outer_interval: float = 1.5, internal_interval: float = 0.1):
+    def _send_online(self, name: str, outer_interval: float = 1.5, internal_interval: float = 0.1) -> None:
         pag.hotkey("alt", "k", interval= internal_interval)
-        
-        #// pag.hotkey("ctrl", "alt", "/", interval= internal_interval)
-        #// pag.hotkey("ctrl", "alt", "/", interval= internal_interval)
 
         pag.hotkey("ctrl", "a", interval= internal_interval)
         pag.press("backspace", interval= internal_interval)
@@ -122,18 +131,21 @@ class Auto_Sender():
         pag.hotkey("ctrl", "v", interval= internal_interval)
         pag.press("enter")
         
-    def send_all(self):
-        for name in NAMES:
+    def send_all(self) -> None:
+        for name in self.data.names: # type: ignore
             self.send(name)
 
     def run(self) -> None:
+        self.check_data()
+        
         try:
-            self.open_app_online() 
-        except subprocess.CalledProcessError: # the os handles it
+            self._open_app_offline() 
+        except FileNotFoundError as e: # the os handles it
+            messagebox.showerror(message= str(e))
             return
         except WindowNotFoundException as e:
-            messagebox.showerror(title= "Window not found", message= str(e))
+            messagebox.showerror(message= str(e))
             return
 
-        self.set_message(TEXT)
+        self.set_message(self.data.message)# type: ignore
         self.send_all()
