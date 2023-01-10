@@ -1,17 +1,8 @@
 import shelve
 import sys
-from enum import Enum
 from pathlib import Path
 
 from PIL import Image
-
-
-class Data_Variables(Enum):
-    whatsApp_path = "path"
-    names = "names"
-    message = "message"
-    online = "online"
-    
 
 class Data:
     SAVE_FILE_PATH: Path = Path(sys.path[0]) / "App Data" / "data"

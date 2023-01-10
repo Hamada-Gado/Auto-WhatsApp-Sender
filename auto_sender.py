@@ -141,7 +141,6 @@ class Auto_Sender():
         try:
             self._open_app_offline() 
         except FileNotFoundError as e: # the os handles it
-            messagebox.showerror(message= str(e))
             return
         except WindowNotFoundException as e:
             messagebox.showerror(message= str(e))

@@ -1,20 +1,3 @@
-class FileNotFoundException(Exception):
-    
-    def __init__(self, message: str) -> None:
-        message = \
-        f"""\
-        Error: {message}
-
-        Reasons: Application might have taken very long
-        time to start
-
-        Solution: Run the program again without closing
-        the targeted application or increase the minimum search
-        time for the window\
-        """
-
-        super().__init__(message)
-
 class WindowNotFoundException(Exception):
     
     def __init__(self) -> None:
@@ -42,7 +25,7 @@ class NamesNotFoundException(Exception):
         Reasons: Did not save a list of names of at
         least one person to send
                 
-        Solution: Go to save variables then names and add
+        Solution: Go to settings then names and add
         a minimum of one name
         """
    
@@ -57,7 +40,7 @@ class MessageNotFoundException(Exception):
 
         Reasons: No text message or image is saved to send
 
-        Solution: Go to save variables then message and
+        Solution: Go to settings then message and
         add a text or path to an image\
         """
 
