@@ -2,8 +2,6 @@ import subprocess
 import time
 import webbrowser
 from io import BytesIO
-from pathlib import Path
-from tkinter import messagebox
 
 import pyautogui as pag
 import pygetwindow as pgw
@@ -16,11 +14,7 @@ from exceptions import *
 
 
 class Auto_Sender():
-    # TODO make it possible to send more than one text message or photo
-    
-    WHATSAPP_TITLE  : str   = "WhatsApp"
-    WHATSAPP_URL    : str   = "https://web.whatsapp.com/"
-    OPINING_METHOD  : bool  = True
+    # TODO make it possible to send more than one text message or photo 
     
     def __init__(self, data: Data) -> None:
         self.data: Data = data
@@ -47,10 +41,7 @@ class Auto_Sender():
         
     def _send_text_to_clipboard(self, message: str) -> None:
         pyperclip.copy(message)
-        
-    def check_data(self) -> None:
-        pass
-        
+
     def open(self) -> None:
         if self.data.online:
             self._open_app_online()
@@ -58,46 +49,40 @@ class Auto_Sender():
             self._open_app_offline()
 
     def _open_app_offline(self, minSearchTime: float = 5) -> None:
-        try:
-            subprocess.run(['start', "", self.data.whatsApp_path], capture_output= True, shell = True).check_returncode()
-        except subprocess.CalledProcessError as e:
-            raise FileNotFoundError(str(e.stderr, encoding="utf-8"))
-
+        subprocess.run(['start', "", self.data.whatsApp_path], shell = True).check_returncode()
+        
+        whatsApp_window: pgw.Window | None = None
         start_time = time.time()
+        
+        while time.time() - start_time < minSearchTime:
+            for window in pgw.getWindowsWithTitle(self.data.WHATSAPP_TITLE):
+                if window.title == self.data.WHATSAPP_TITLE:
+                    whatsApp_window = window
+            
     
-        while True:
-            try:
-                for window in pgw.getWindowsWithTitle(Auto_Sender.WHATSAPP_TITLE):
-                    if window.title == Auto_Sender.WHATSAPP_TITLE:
-                        self.whatsApp_window = window
-                        break
-                else:
-                    raise WindowNotFoundException
+        if whatsApp_window is None:
+            raise WindowNotFoundException  
+            
+        start_time = time.time()
+        while not whatsApp_window.isActive: # wait for the window to be active
+            if time.time() - start_time > minSearchTime:
+                raise WindowNotFoundException
 
-            except WindowNotFoundException:
-                if time.time() - start_time > minSearchTime:
-                    raise WindowNotFoundException
-                continue
-            break
-        
-        while not self.whatsApp_window.isActive: # wait for the window to be active
-            pass
-        
-        self.whatsApp_window.maximize()
+        whatsApp_window.maximize()
         time.sleep(minSearchTime) # wait to make sure the application is ready for shortcuts
-        
+    
     def _open_app_online(self, minWaitTime: float = 5) -> None:
-        if not webbrowser.open_new(Auto_Sender.WHATSAPP_URL):
+        if not webbrowser.open_new(self.data.WHATSAPP_URL):
             raise WindowNotFoundException
         
-        time.sleep(minWaitTime)
+        time.sleep(minWaitTime) # wait to make sure the application is ready for shortcuts 
         pag.press("f11")
         
-    def send(self,*args, **kwargs) -> None:
-        if self.OPINING_METHOD:
-            self._send_offline(*args, **kwargs)
-        else:
+    def send(self, *args, **kwargs) -> None:
+        if self.data.online:
             self._send_online(*args, **kwargs)
+        else:
+            self._send_offline(*args, **kwargs)
 
     def _send_offline(self, name: str, outer_interval: float = 0.5, internal_interval: float = 0.1) -> None:
         pag.hotkey("ctrl", "1", interval= internal_interval)
@@ -114,6 +99,7 @@ class Auto_Sender():
         
         pag.hotkey("ctrl", "v", interval= internal_interval)
         pag.press("enter")
+        
         
     def _send_online(self, name: str, outer_interval: float = 1.5, internal_interval: float = 0.1) -> None:
         pag.hotkey("alt", "k", interval= internal_interval)
@@ -134,17 +120,15 @@ class Auto_Sender():
     def send_all(self) -> None:
         for name in self.data.names:
             self.send(name)
-
-    def run(self) -> None:
-        self.check_data()
-        
-        try:
-            self._open_app_offline() 
-        except FileNotFoundError as e: # the os handles it
-            return
-        except WindowNotFoundException as e:
-            messagebox.showerror(message= str(e))
-            return
-
+            
+    def check_data(self) -> None:
+        if len(self.data.names) == 0:
+            raise NamesNotFoundException
+        if isinstance(self.data.message, str) and len(self.data.message) == 0:
+            raise MessageNotFoundException
+          
+    def run(self) -> None: 
+        self.check_data()   
+        self.open()
         self.set_message(self.data.message)
         self.send_all()

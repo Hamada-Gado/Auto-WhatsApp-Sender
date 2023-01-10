@@ -1,6 +1,11 @@
 import tkinter as tk
-from .names import Names
+from tkinter import messagebox
+
 import gui
+from exceptions import MyException
+
+from .names import Names
+
 
 class Main_Menu(tk.Frame):
     
@@ -20,7 +25,7 @@ class Main_Menu(tk.Frame):
 
     def set_buttons(self):
         self.buttons: tk.Frame = tk.Frame(self, bg= self["background"])
-        tk.Button(self.buttons, text= "Run", font= self.font, command= self.master.auto_sender.run)
+        tk.Button(self.buttons, text= "Run", font= self.font, command= self.auto_sender_run)
         tk.Button(self.buttons, text= Names.Settings.value, font= self.font, command= lambda : self.master.change_frame(Names.Settings))
         tk.Button(self.buttons, text= Names.Help.value, font= self.font)
         
@@ -29,5 +34,13 @@ class Main_Menu(tk.Frame):
         
         self.buttons.pack(anchor= tk.CENTER, expand= True)
 
-    def change_to_settings(self):
-        self.master.change_frame(Names.Settings)
+    def auto_sender_run(self):
+        from pyautogui import FailSafeException
+        try:
+            self.master.auto_sender.run()
+        except MyException as e:
+            messagebox.showerror(message= str(e)) 
+        except FailSafeException:
+            messagebox.showwarning(message= "FailSafe triggered")
+        except FileNotFoundError: # os handles it
+            pass

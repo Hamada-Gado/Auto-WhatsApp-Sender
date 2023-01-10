@@ -6,16 +6,18 @@ from typing import Any
 from PIL import Image
 
 class Data:
+    # constants
     SAVE_FILE_PATH: Path = Path(sys.path[0]) / "App Data" / "data"
-
+    WHATSAPP_TITLE  : str   = "WhatsApp"
+    WHATSAPP_URL    : str   = "https://web.whatsapp.com/"
+    
     # Default data
     DEFAULT: dict[str, Any] = {
-        'whatsApp_path' : "whatsApp.exe",
+        'whatsApp_path' : "WhatsApp.exe",
         'names' : [],
-        'message' : 'This message was send by an auto sender',
+        'message' : "This message was send by an auto sender",
         'online' : True
     }
-     
 
     def __init__(self) -> None:
         self.whatsApp_path: Path
@@ -42,7 +44,7 @@ class Data:
             except KeyError:
                 self.__dict__.update(Data.DEFAULT)
             
-    def load_default(self):
+    def load_default(self) -> None:
         self.__dict__.update(Data.DEFAULT)         
             
     def __str__(self) -> str:

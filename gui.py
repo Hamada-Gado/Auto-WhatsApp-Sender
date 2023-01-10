@@ -14,6 +14,7 @@ class Gui(tk.Tk):
         # Data and Automation class
         self.data: Data = Data()
         self.auto_sender: Auto_Sender = Auto_Sender(self.data)
+        self.data.load_default()
         
         # creating base window
         self.geometry(f"{Gui.WIDTH}x{Gui.HEIGHT}")

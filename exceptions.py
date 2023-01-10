@@ -1,4 +1,9 @@
-class WindowNotFoundException(Exception):
+class MyException(Exception):
+    
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+class WindowNotFoundException(MyException):
     
     def __init__(self) -> None:
         message: str = \
@@ -6,16 +11,18 @@ class WindowNotFoundException(Exception):
         Error: Window not found
 
         Reasons: Application might have taken very long
-        time to start
+        time to start or there is no internet connection if
+        you are using online mode
 
         Solution: Run the program again without closing
         the targeted application or increase the minimum search
-        time for the window\
+        time for the window or check your internet connection if
+        you are using online mode\
         """
     
         super().__init__(message)
 
-class NamesNotFoundException(Exception):
+class NamesNotFoundException(MyException):
    
     def __init__(self) -> None:
         message: str = \
@@ -31,7 +38,7 @@ class NamesNotFoundException(Exception):
    
         super().__init__(message)
         
-class MessageNotFoundException(Exception):
+class MessageNotFoundException(MyException):
     
     def __init__(self) -> None:
         message: str = \
