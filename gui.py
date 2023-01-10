@@ -28,12 +28,12 @@ class Gui(tk.Tk):
         self.frames[frames.Names.Settings] = frames.Settings(self)
         self.frames[frames.Names.Help] = frames.Help(self)
         
-        self.current_frame.pack()
+        self.current_frame.pack(expand= True, fill= tk.BOTH)
 
     def change_frame(self, frame_name: frames.Names):
         self.current_frame.pack_forget()
         self.current_frame = self.frames[frame_name]
-        self.current_frame.pack()
+        self.current_frame.pack(expand= True, fill= tk.BOTH)
     
     def run(self):
         self.mainloop()
