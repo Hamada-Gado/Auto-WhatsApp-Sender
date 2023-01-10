@@ -8,7 +8,7 @@ from tkinter import messagebox
 import pyautogui as pag
 import pygetwindow as pgw
 import pyperclip
-import win32clipboard  # type: ignore
+import win32clipboard
 from PIL import Image
 
 from data import Data
@@ -59,7 +59,7 @@ class Auto_Sender():
 
     def _open_app_offline(self, minSearchTime: float = 5) -> None:
         try:
-            subprocess.run(['start', "", self.data.whatsApp_path], capture_output= True, shell = True).check_returncode() # type: ignore
+            subprocess.run(['start', "", self.data.whatsApp_path], capture_output= True, shell = True).check_returncode()
         except subprocess.CalledProcessError as e:
             raise FileNotFoundError(str(e.stderr, encoding="utf-8"))
 
@@ -132,7 +132,7 @@ class Auto_Sender():
         pag.press("enter")
         
     def send_all(self) -> None:
-        for name in self.data.names: # type: ignore
+        for name in self.data.names:
             self.send(name)
 
     def run(self) -> None:
@@ -146,5 +146,5 @@ class Auto_Sender():
             messagebox.showerror(message= str(e))
             return
 
-        self.set_message(self.data.message)# type: ignore
+        self.set_message(self.data.message)
         self.send_all()

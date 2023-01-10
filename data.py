@@ -1,17 +1,27 @@
 import shelve
 import sys
 from pathlib import Path
+from typing import Any
 
 from PIL import Image
 
 class Data:
     SAVE_FILE_PATH: Path = Path(sys.path[0]) / "App Data" / "data"
 
+    # Default data
+    DEFAULT: dict[str, Any] = {
+        'whatsApp_path' : "whatsApp.exe",
+        'names' : [],
+        'message' : 'This message was send by an auto sender',
+        'online' : True
+    }
+     
+
     def __init__(self) -> None:
-        self.whatsApp_path: Path | None = None
-        self.names: list[str] | None = None
-        self.message: str | Image.Image | None = None
-        self.online: bool = True
+        self.whatsApp_path: Path
+        self.names: list[str]
+        self.message: str | Image.Image
+        self.online: bool
         self.load()
         
     def save(self) -> None:
@@ -30,7 +40,10 @@ class Data:
                 other: Data = shelf_file["data"]
                 self.__dict__.update(other.__dict__)
             except KeyError:
-                pass
+                self.__dict__.update(Data.DEFAULT)
+            
+    def load_default(self):
+        self.__dict__.update(Data.DEFAULT)         
             
     def __str__(self) -> str:
         return f"{self.__dict__}"
