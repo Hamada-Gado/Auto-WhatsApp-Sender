@@ -7,16 +7,18 @@ from PIL import Image
 
 class Data:
     # constants
-    SAVE_FILE_PATH: Path = Path(sys.path[0]) / "App Data" / "data"
+    SAVE_FILE_PATH  : Path  = Path(sys.path[0]) / "App Data" / "data"
     WHATSAPP_TITLE  : str   = "WhatsApp"
     WHATSAPP_URL    : str   = "https://web.whatsapp.com/"
+    WHATSAPP_PATH   : Path  = Path("WhatsApp.exe")
+    NAMES           : list  = list()
     
     # Default data
     DEFAULT: dict[str, Any] = {
-        'whatsApp_path' : Path("WhatsApp.exe"),
-        'names' : list(),
-        'message' : "This message was send by an auto sender",
-        'online' : True
+        'whatsApp_path' : WHATSAPP_PATH,
+        'names'         : NAMES,
+        'message'       : "This message was send by an auto sender",
+        'online'        : True
     }
 
     def __init__(self) -> None:
@@ -45,7 +47,6 @@ class Data:
             
     def load_default(self) -> None:
         self.__dict__.update(Data.DEFAULT)
-        self.names = list()
             
     def __str__(self) -> str:
         return f"{self.__dict__}"

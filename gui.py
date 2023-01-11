@@ -13,10 +13,12 @@ class Gui(tk.Tk):
         
         # Data and Automation class
         self.data: Data = Data()
+        # self.data.load_default()
         self.auto_sender: Auto_Sender = Auto_Sender(self.data)
         
         # creating base window
         self.geometry(f"{Gui.WIDTH}x{Gui.HEIGHT}")
+        self.title("WhatsApp Auto Sender")
         
         # creating frames
         self.current_frame: tk.Frame
