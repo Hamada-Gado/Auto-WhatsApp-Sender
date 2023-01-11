@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from threading import Thread
 
 import gui
 from exceptions import MyException
@@ -25,7 +26,7 @@ class Main_Menu(tk.Frame):
 
     def set_buttons(self):
         self.buttons: tk.Frame = tk.Frame(self, bg= self["background"])
-        tk.Button(self.buttons, text= "Run", font= self.font, command= self.auto_sender_run)
+        tk.Button(self.buttons, text= "Run", font= self.font, command= Thread(target=self.auto_sender_run).start)
         tk.Button(self.buttons, text= Names.Settings.value, font= self.font, command= lambda : self.master.change_frame(Names.Settings))
         tk.Button(self.buttons, text= Names.Help.value, font= self.font)
         
