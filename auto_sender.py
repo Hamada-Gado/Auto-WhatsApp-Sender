@@ -42,19 +42,19 @@ class Auto_Sender():
     def _send_text_to_clipboard(self, message: str) -> None:
         pyperclip.copy(message)
 
-    def open(self) -> None:
+    def open(self, minWaitTime: float = 5) -> None:
         if self.data.online:
-            self._open_app_online()
+            self._open_app_online(minWaitTime)
         else:
-            self._open_app_offline()
+            self._open_app_offline(minWaitTime)
 
-    def _open_app_offline(self, minSearchTime: float = 5) -> None:
+    def _open_app_offline(self, minWaitTime: float = 5) -> None:
         subprocess.run(['start', "", self.data.whatsApp_path], shell = True).check_returncode()
         
         whatsApp_window: pgw.Window | None = None
         start_time = time.time()
         
-        while time.time() - start_time < minSearchTime:
+        while time.time() - start_time < minWaitTime:
             for window in pgw.getWindowsWithTitle(self.data.WHATSAPP_TITLE):
                 if window.title == self.data.WHATSAPP_TITLE:
                     whatsApp_window = window
@@ -65,11 +65,11 @@ class Auto_Sender():
             
         start_time = time.time()
         while not whatsApp_window.isActive: # wait for the window to be active
-            if time.time() - start_time > minSearchTime:
+            if time.time() - start_time > minWaitTime:
                 raise WindowNotFoundException
 
         whatsApp_window.maximize()
-        time.sleep(minSearchTime) # wait to make sure the application is ready for shortcuts
+        time.sleep(minWaitTime) # wait to make sure the application is ready for shortcuts
     
     def _open_app_online(self, minWaitTime: float = 5) -> None:
         if not webbrowser.open_new(self.data.WHATSAPP_URL):
@@ -117,9 +117,9 @@ class Auto_Sender():
         pag.hotkey("ctrl", "v", interval= internal_interval)
         pag.press("enter")
         
-    def send_all(self) -> None:
+    def send_all(self, internal_interval: float = 0.1) -> None:
         for name in self.data.names:
-            self.send(name)
+            self.send(name, internal_interval= internal_interval)
             
     def check_data(self) -> None:
         if len(self.data.names) == 0:
@@ -129,6 +129,6 @@ class Auto_Sender():
           
     def run(self) -> None: 
         self.check_data()   
-        self.open()
+        self.open(self.data.min_wait_time)
         self.set_message(self.data.message)
-        self.send_all()
+        self.send_all(self.data.interval)

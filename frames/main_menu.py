@@ -28,7 +28,7 @@ class Main_Menu(tk.Frame):
         self.buttons: tk.Frame = tk.Frame(self, bg= self["background"])
         tk.Button(self.buttons, text= "Run", font= self.font, command= self.auto_sender_run)
         tk.Button(self.buttons, text= Names.Settings.value, font= self.font, command= lambda : self.master.change_frame(Names.Settings))
-        tk.Button(self.buttons, text= Names.Help.value, font= self.font, command= lambda : self.master.change_frame(Names.Help))
+        tk.Button(self.buttons, text= Names.Help.value, state= tk.DISABLED,font= self.font, command= lambda : self.master.change_frame(Names.Help))
         
         for child in self.buttons.winfo_children():
             child.grid_configure(pady= 5)
