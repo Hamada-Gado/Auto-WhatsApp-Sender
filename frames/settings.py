@@ -1,6 +1,6 @@
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 
 from PIL import Image
 
@@ -60,7 +60,23 @@ class Settings(tk.Frame):
             
         self.online_var.set(self.master.data.online)
         
+        self.min_wait_time_var.set(self.master.data.min_wait_time)
+        
+        self.interval_var.set(self.master.data.interval)
+        
     def save(self):
+        try:
+            self.master.data.min_wait_time = self.min_wait_time_var.get()
+        except tk.TclError:
+            messagebox.showerror(title= self.master.title(), message= "Min Wait Time expect a number")     
+            return
+        
+        try:
+            self.master.data.interval = self.interval_var.get()
+        except tk.TclError:
+            messagebox.showerror(title= self.master.title(), message= "Interval expect a number")     
+            return
+        
         self.master.data.whatsApp_path = Path(self.whatsApp_var.get())
         self.master.data.names = self.options_list.copy()
         if self.message_var.get() != "":
@@ -79,24 +95,21 @@ class Settings(tk.Frame):
         
         # names list
         tk.Label(self.top_frame, text= "Names", font= self.label_font).grid(row= 1, column= 0)
-        self.names_option_frame: tk.Frame = tk.Frame(self.top_frame)
         
+        self.names_left_frame: tk.Frame = tk.Frame(self.top_frame)
         self.name_var: tk.StringVar = tk.StringVar()
-        tk.Entry(self.names_option_frame, textvariable= self.name_var, font= self.font).grid(row= 0, column= 0)
+        tk.Entry(self.names_left_frame, textvariable= self.name_var, font= self.font).grid(row= 0, column= 0)
+        self.names_left_frame.grid(row= 1, column= 1)        
         
+        self.names_right_frame: tk.Frame = tk.Frame(self.top_frame)
         self.options_list: list[str] = self.master.data.names.copy()
         self.options_var: tk.StringVar = tk.StringVar()
-        self.option_menu: tk.OptionMenu = tk.OptionMenu(self.names_option_frame, self.options_var, "", *self.options_list)
-        self.option_menu.grid(row= 0, column= 1)
+        self.option_menu: tk.OptionMenu = tk.OptionMenu(self.names_right_frame, self.options_var, "", *self.options_list)
+        self.option_menu.grid(row= 0, column= 0)
+        tk.Button(self.names_right_frame, text= "Add", font= self.font, command= self.add_option).grid(row= 0, column= 1)
+        tk.Button(self.names_right_frame, text= "Remove", font= self.font, command= self.remove_selected_option).grid(row= 0, column= 2)
         
-        self.names_option_frame.grid(row= 1, column= 1)
-        
-        self.names_buttons_frame: tk.Frame = tk.Frame(self.top_frame)
-        
-        tk.Button(self.names_buttons_frame, text= "Add", font= self.font, command= self.add_option).grid(row= 0, column= 0)
-        tk.Button(self.names_buttons_frame, text= "Remove", font= self.font, command= self.remove_selected_option).grid(row= 0, column= 1)
-        
-        self.names_buttons_frame.grid(row= 1, column= 2)
+        self.names_right_frame.grid(row= 1, column= 2)
         
         # message to send
         tk.Label(self.top_frame, text= "Message", font= self.label_font).grid(row= 2, column= 0)
@@ -109,6 +122,16 @@ class Settings(tk.Frame):
         self.online_var: tk.BooleanVar = tk.BooleanVar(None, self.master.data.online)
         tk.Radiobutton(self.top_frame, indicatoron= False, text= "True", font= self.font, variable= self.online_var, value= True).grid(row= 3, column= 1)
         tk.Radiobutton(self.top_frame, indicatoron= False, text= "False", font= self.font,  variable= self.online_var, value= False).grid(row= 3, column= 2)
+        
+        # min wait time
+        tk.Label(self.top_frame, text= "Min Wait Time", font= self.label_font).grid(row= 4, column= 0)
+        self.min_wait_time_var: tk.DoubleVar = tk.DoubleVar(None, self.master.data.min_wait_time)
+        tk.Entry(self.top_frame, textvariable= self.min_wait_time_var, font= self.font).grid(row= 4, column= 1)
+        
+        # internal interval
+        tk.Label(self.top_frame, text= "Interval", font= self.label_font).grid(row= 5, column= 0)
+        self.interval_var: tk.DoubleVar = tk.DoubleVar(None, self.master.data.min_wait_time)
+        tk.Entry(self.top_frame, textvariable= self.interval_var, font= self.font).grid(row= 5, column= 1)
         
         for child in self.top_frame.winfo_children():
             child.grid_configure(padx= 10, pady= 5)
@@ -131,7 +154,7 @@ class Settings(tk.Frame):
         self.options_var.set(self.option_menu['menu'].entrycget(0,"label"))
 
     def set_image(self):
-        file_path: str = filedialog.askopenfilename()
+        file_path: str = filedialog.askopenfilename(title= self.master.title())
         for ending in ["gif", "png", "tiff", "webp", "ppm", "jpeg", "jpg", "bmp"]:
             if file_path.endswith(ending):
                 break
@@ -139,3 +162,4 @@ class Settings(tk.Frame):
             return
         
         self.master.data.message = Image.open(file_path)           
+        self.message_var.set('')

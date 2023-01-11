@@ -18,7 +18,9 @@ class Data:
         'whatsApp_path' : WHATSAPP_PATH,
         'names'         : NAMES,
         'message'       : "This message was send by an auto sender",
-        'online'        : True
+        'online'        : True,
+        'min_wait_time' : 5,
+        'interval'      : 0.1
     }
 
     def __init__(self) -> None:
@@ -26,6 +28,8 @@ class Data:
         self.names: list[str]
         self.message: str | Image.Image
         self.online: bool
+        self.min_wait_time: float
+        self.interval: float = 0.1
         self.load()
         
     def save(self) -> None:
