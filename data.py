@@ -13,8 +13,8 @@ class Data:
     
     # Default data
     DEFAULT: dict[str, Any] = {
-        'whatsApp_path' : "WhatsApp.exe",
-        'names' : [],
+        'whatsApp_path' : Path("WhatsApp.exe"),
+        'names' : list(),
         'message' : "This message was send by an auto sender",
         'online' : True
     }
@@ -45,7 +45,8 @@ class Data:
                 self.__dict__.update(Data.DEFAULT)
             
     def load_default(self) -> None:
-        self.__dict__.update(Data.DEFAULT)         
+        self.__dict__.update(Data.DEFAULT)
+        self.names = list()
             
     def __str__(self) -> str:
         return f"{self.__dict__}"
