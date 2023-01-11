@@ -13,7 +13,6 @@ class Gui(tk.Tk):
         
         # Data and Automation class
         self.data: Data = Data()
-        # self.data.load_default()
         self.auto_sender: Auto_Sender = Auto_Sender(self.data)
         
         # creating base window
