@@ -47,6 +47,7 @@ class Settings(tk.Frame):
     def update_vars(self):
         self.whatsApp_var.set(self.master.data.whatsApp_path.as_posix())
         
+        self.options_list = self.master.data.names.copy()
         self.options_var.set('')
         self.option_menu['menu'].delete(0,'end')
         for name in self.master.data.names: 

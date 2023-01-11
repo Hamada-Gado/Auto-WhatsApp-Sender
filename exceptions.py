@@ -15,7 +15,7 @@ class WindowNotFoundException(MyException):
         you are using online mode
 
         Solution: Run the program again without closing
-        the targeted application or increase the minimum search
+        the WhatsApp application or increase the minimum search
         time for the window or check your internet connection if
         you are using online mode\
         """
