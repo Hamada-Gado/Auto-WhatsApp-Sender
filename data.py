@@ -27,15 +27,14 @@ class Data:
         self.load()
         
     def save(self) -> None:
-        if not Data.SAVE_FILE_PATH.parent.exists:
+        if not Data.SAVE_FILE_PATH.parent.exists():
             Data.SAVE_FILE_PATH.parent.mkdir()
         
         with shelve.open(Data.SAVE_FILE_PATH.as_posix()) as shelf_file:
             shelf_file["data"] = self
     
     def load(self) -> None:
-        if not Data.SAVE_FILE_PATH.parent.exists:
-            Data.SAVE_FILE_PATH.parent.mkdir()
+        Data.SAVE_FILE_PATH.parent.mkdir(exist_ok= True)
         
         with shelve.open(Data.SAVE_FILE_PATH.as_posix()) as shelf_file:
             try:
